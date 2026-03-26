@@ -1,20 +1,9 @@
 import { useState } from 'react';
-import { Sidebar } from './components/Sidebar';
-import { ChatArea } from './components/ChatArea';
+import { Sidebar } from './components/sidebar';
+import { ChatArea } from './components/chat-area';
+import type { Channel, Message } from './types';
 
-export interface Message {
-  id: string;
-  user: string;
-  text: string;
-  timestamp: Date;
-  avatar: string;
-}
-
-export interface Channel {
-  id: string;
-  name: string;
-  messages: Message[];
-}
+export type { Channel, Message } from './types';
 
 const initialChannels: Channel[] = [
   {
