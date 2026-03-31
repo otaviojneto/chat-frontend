@@ -7,7 +7,7 @@ import type { Channel } from '../App';
 interface SidebarProps {
   channels: Channel[];
   activeChannelId: string;
-  onSelectChannel: (id: string) => void;
+  onSelectChannel: (channelName: string) => void;
 }
 
 export function Sidebar({ channels, activeChannelId, onSelectChannel }: SidebarProps) {
@@ -26,7 +26,7 @@ export function Sidebar({ channels, activeChannelId, onSelectChannel }: SidebarP
             {channels.map(channel => (
               <Button
                 key={channel.id}
-                onClick={() => onSelectChannel(channel.id)}
+                onClick={() => onSelectChannel(channel.name)}
                 variant="ghost"
                 className={`w-full justify-start gap-2 ${activeChannelId === channel.id
                   ? 'bg-purple-700 text-white hover:bg-purple-700'
