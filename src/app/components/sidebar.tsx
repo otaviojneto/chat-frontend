@@ -1,7 +1,12 @@
-import { Hash } from 'lucide-react';
+'use client';
+
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
+import { Hash, Plus } from 'lucide-react';
+import { useState } from 'react';
 import type { Channel } from '../App';
 
 interface SidebarProps {
@@ -11,6 +16,8 @@ interface SidebarProps {
 }
 
 export function Sidebar({ channels, activeChannelId, onSelectChannel }: SidebarProps) {
+  const [isAddChannelDialogOpen, setIsAddChannelDialogOpen] = useState(false);
+
   return (
     <div className="w-64 bg-purple-900 text-white flex flex-col">
       <div className="p-4">
@@ -21,7 +28,7 @@ export function Sidebar({ channels, activeChannelId, onSelectChannel }: SidebarP
 
       <ScrollArea className="flex-1">
         <div className="p-3">
-          <div className="text-sm text-purple-300 mb-2 px-2">Canais</div>
+          <div className="text-sm text-purple-300 mb-2 px-2 py-1 flex justify-between hover:bg-purple-700 rounded-md">Canais  <button onClick={() => setIsAddChannelDialogOpen(true)} className="text-transparent cursor-pointer hover:text-white"><Plus size={18} /></button></div>
           <div className="space-y-1">
             {channels.map(channel => (
               <Button
@@ -40,6 +47,22 @@ export function Sidebar({ channels, activeChannelId, onSelectChannel }: SidebarP
           </div>
         </div>
       </ScrollArea>
-    </div>
+
+      <Dialog open={isAddChannelDialogOpen} onOpenChange={setIsAddChannelDialogOpen}>
+        <DialogContent className="max-w-s">
+          <DialogHeader>
+            <DialogTitle>Adicionar Canal</DialogTitle>
+            <DialogDescription >
+              Adicione um novo canal para sua equipe.
+            </DialogDescription>
+            <Input type="text" className="border-gray-400" placeholder="Nome do canal" />
+          </DialogHeader>
+          <DialogFooter className="flex justify-end gap-2 bg-transparent border-t-0">
+            <Button variant="outline" onClick={() => setIsAddChannelDialogOpen(false)}>Cancelar</Button>
+            <Button onClick={() => setIsAddChannelDialogOpen(false)}>Criar canal</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div >
   );
 }

@@ -1,5 +1,5 @@
-import api from '../../api';
-import type { BackendMessage, SendMessagePayload } from './type';
+import api from "../../api/api";
+import type { BackendMessage, SendMessagePayload } from "./type";
 
 export const messageService = {
   getMessages: async (roomId: string): Promise<BackendMessage[]> => {
@@ -8,7 +8,7 @@ export const messageService = {
   },
 
   sendMessage: async (payload: SendMessagePayload): Promise<unknown> => {
-    const response = await api.post('/messages', payload);
+    const response = await api.post("/messages", payload);
     return response.data;
   },
 };

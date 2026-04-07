@@ -23,7 +23,7 @@ type ChatAreaProps = {
   currentUserId: string | null;
 };
 
-function mapToUiMessages(raw: BackendMessage[]): Message[] {
+const mapToUiMessages = (raw: BackendMessage[]): Message[] => {
   return raw.map((msg) => ({
     id: msg.id,
     text: msg.content,
@@ -33,7 +33,7 @@ function mapToUiMessages(raw: BackendMessage[]): Message[] {
   }));
 }
 
-export function ChatArea({ channel, currentUserId }: ChatAreaProps) {
+export const ChatArea = ({ channel, currentUserId }: ChatAreaProps) => {
   const [draft, setDraft] = useState('');
   const queryClient = useQueryClient();
   const { data: rawMessages = [] } = useGetMessages(channel.id);
