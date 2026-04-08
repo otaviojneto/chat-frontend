@@ -8,15 +8,33 @@ import { Separator } from '@/components/ui/separator';
 import { Hash, Plus } from 'lucide-react';
 import { useState } from 'react';
 import type { Channel } from '../App';
+import type { UseMutateAsyncFunction } from '@tanstack/react-query';
+import type { Room } from '@/application/services/rooms/type';
 
 interface SidebarProps {
   channels: Channel[];
   activeChannelId: string;
   onSelectChannel: (channelName: string) => void;
+  onAddChannel: UseMutateAsyncFunction<Room, Error, string, unknown>
 }
 
-export function Sidebar({ channels, activeChannelId, onSelectChannel }: SidebarProps) {
+export function Sidebar({ channels, activeChannelId, onSelectChannel, onAddChannel }: SidebarProps) {
   const [isAddChannelDialogOpen, setIsAddChannelDialogOpen] = useState(false);
+  const [newChannelName, setNewChannelName] = useState('');
+
+
+  const handleCreateRoom = async (name: string) => {
+    const normalizedName = name.trim();
+    if (!normalizedName) return;
+
+    await onAddChannel(normalizedName, {
+      onSuccess: () => {
+        setIsAddChannelDialogOpen(false);
+        setNewChannelName('');
+      },
+    });
+  };
+
 
   return (
     <div className="w-64 bg-purple-900 text-white flex flex-col">
@@ -55,11 +73,11 @@ export function Sidebar({ channels, activeChannelId, onSelectChannel }: SidebarP
             <DialogDescription >
               Adicione um novo canal para sua equipe.
             </DialogDescription>
-            <Input type="text" className="border-gray-400" placeholder="Nome do canal" />
+            <Input type="text"  className="border-gray-400" placeholder="Nome do canal" value={newChannelName} onChange={(e) => setNewChannelName(e.target.value)} />
           </DialogHeader>
           <DialogFooter className="flex justify-end gap-2 bg-transparent border-t-0">
             <Button variant="outline" onClick={() => setIsAddChannelDialogOpen(false)}>Cancelar</Button>
-            <Button onClick={() => setIsAddChannelDialogOpen(false)}>Criar canal</Button>
+            <Button onClick={() => handleCreateRoom(newChannelName)} disabled={!newChannelName.trim()}>Criar canal</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

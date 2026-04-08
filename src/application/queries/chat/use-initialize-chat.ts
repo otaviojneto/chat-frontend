@@ -5,17 +5,17 @@ import { roomService } from "~/application/services/rooms/rooms";
 import { userService } from "~/application/services/users/users";
 import { queryKeys } from "../keys";
 
-type BootstrapResult = {
+type InitializeChatResult = {
   currentUserId: string;
   channels: Channel[];
 };
 
-export const useChatBootstrap = () => {
+export const useInitializeChat = () => {
   const queryClient = useQueryClient();
 
   return useQuery({
-    queryKey: queryKeys.chatBootstrap,
-    queryFn: async (): Promise<BootstrapResult> => {
+    queryKey: queryKeys.initializeChat,
+    queryFn: async (): Promise<InitializeChatResult> => {
       const users = await queryClient.fetchQuery({
         queryKey: queryKeys.users,
         queryFn: () => userService.getUsers(),
