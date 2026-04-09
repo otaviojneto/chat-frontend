@@ -11,4 +11,8 @@ export const roomService = {
     const response = await api.post<Room>("/room", { name });
     return response.data;
   },
+
+  deleteRoom: async (id: string): Promise<void> => {
+    await api.delete(`/room/${id}`);
+  },
 };
