@@ -1,22 +1,22 @@
 'use client';
 
+import type { Room } from '@/application/services/rooms/type';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Separator } from '@/components/ui/separator';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { EllipsisVertical, Hash, Loader2, Plus, Trash2 } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Separator } from '@/components/ui/separator';
+import { cn } from '@/lib/utils';
+import type { UseMutateAsyncFunction } from '@tanstack/react-query';
+import { EllipsisVertical, Hash, Loader2, Plus, Settings, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import type { Channel } from '../App';
-import type { UseMutateAsyncFunction } from '@tanstack/react-query';
-import type { Room } from '@/application/services/rooms/type';
-import { cn } from '@/lib/utils';
 
 interface SidebarProps {
   channels: Channel[];
@@ -39,7 +39,7 @@ export function Sidebar({
   const [newChannelName, setNewChannelName] = useState('');
   const [selectedChannelId, setSelectedChannelId] = useState<string | null>(null);
   const [openDeleteChannelDialog, setOpenDeleteChannelDialog] = useState(false);
-
+  const [openSettingsDialog, setOpenSettingsDialog] = useState(false);
 
   const handleCreateRoom = async (name: string) => {
     const normalizedName = name.trim();
@@ -69,8 +69,11 @@ export function Sidebar({
 
   return (
     <div className="w-64 bg-blue-800 text-white flex flex-col">
-      <div className="p-4">
+      <div className="p-4 flex justify-between items-center">
         <h1 className="font-bold text-lg">Meu Workspace</h1>
+
+
+        <Button variant="ghost" size="icon" onClick={() => setOpenSettingsDialog(true)} className='cursor-pointer'><Settings /></Button>
       </div>
 
       <Separator className="bg-blue-600" />
@@ -148,6 +151,14 @@ export function Sidebar({
         </DialogContent>
       </Dialog>
 
+      <Dialog open={openSettingsDialog} onOpenChange={setOpenSettingsDialog}>
+        <DialogContent className="max-w-s">
+          <DialogHeader>
+            <DialogTitle>Configurações</DialogTitle>
+            <DialogDescription>Configurações do workspace</DialogDescription>
+          </DialogHeader>
+        </DialogContent>
+      </Dialog>
     </div >
   );
 }

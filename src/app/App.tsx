@@ -5,6 +5,7 @@ import type { Channel } from './types';
 import { useInitializeChat } from '@/application/queries';
 import { useCreateRooms } from '@/application/queries/rooms/use-rooms/use-create-rooms';
 import { useDeleteRoom } from '@/application/queries/rooms/use-rooms/use-delete-room';
+import { ThemeProvider } from 'next-themes';
 
 export type { Channel, Message } from './types';
 
@@ -33,21 +34,23 @@ export default function App() {
   };
 
   return (
-    <div className="flex h-screen bg-background">
-      <Sidebar
-        channels={channels}
-        activeChannelId={activeChannel?.id ?? ''}
-        onSelectChannel={setActiveChannelName}
-        onAddChannel={createRoom}
-        onDeleteChannel={handleDeleteChannel}
-        isDeletingRoom={isDeletingRoom}
-      />
-      {activeChannel && (
-        <ChatArea
-          channel={activeChannel}
-          currentUserId={currentUserId}
+    <ThemeProvider>
+      <div className="flex h-screen bg-background">
+        <Sidebar
+          channels={channels}
+          activeChannelId={activeChannel?.id ?? ''}
+          onSelectChannel={setActiveChannelName}
+          onAddChannel={createRoom}
+          onDeleteChannel={handleDeleteChannel}
+          isDeletingRoom={isDeletingRoom}
         />
-      )}
-    </div>
+        {activeChannel && (
+          <ChatArea
+            channel={activeChannel}
+            currentUserId={currentUserId}
+          />
+        )}
+      </div>
+    </ThemeProvider>
   );
 }
