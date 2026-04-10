@@ -17,6 +17,7 @@ import type { UseMutateAsyncFunction } from '@tanstack/react-query';
 import { EllipsisVertical, Hash, Loader2, Plus, Settings, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import type { Channel } from '../App';
+import MyWorkspace from './my-workspace';
 
 interface SidebarProps {
   channels: Channel[];
@@ -109,6 +110,7 @@ export function Sidebar({
                   <DropdownMenuContent align="end" sideOffset={4} className="min-w-36">
                     <DropdownMenuItem
                       variant="destructive"
+                      className="cursor-pointer"
                       onClick={(e) => handleOpenDeleteChannelDialog(channel.id, e)}
                     >
                       <Trash2 />
@@ -132,7 +134,7 @@ export function Sidebar({
             <Input type="text" className="border-gray-400" placeholder="Nome do canal" value={newChannelName} onChange={(e) => setNewChannelName(e.target.value)} />
           </DialogHeader>
           <DialogFooter className="flex justify-end gap-2 bg-transparent border-t-0">
-            <Button variant="outline" onClick={() => setIsAddChannelDialogOpen(false)}>Cancelar</Button>
+            <Button className="text-gray-400 bg-transparent border-gray-400" variant="outline" onClick={() => setIsAddChannelDialogOpen(false)}>Cancelar</Button>
             <Button onClick={() => handleCreateRoom(newChannelName)} disabled={!newChannelName.trim()}>Criar canal</Button>
           </DialogFooter>
         </DialogContent>
@@ -145,20 +147,13 @@ export function Sidebar({
             <DialogDescription>Tem certeza que deseja deletar este canal?</DialogDescription>
           </DialogHeader>
           <DialogFooter className="flex justify-end gap-2 bg-transparent border-t-0">
-            <Button variant="outline" onClick={() => setOpenDeleteChannelDialog(false)}>Cancelar</Button>
+            <Button className="text-gray-400 bg-transparent border-gray-400" variant="outline" onClick={() => setOpenDeleteChannelDialog(false)}>Cancelar</Button>
             <Button className={cn(isDeletingRoom && 'px-11')} variant="destructive" onClick={() => handleDeleteChannel(selectedChannelId ?? '')} disabled={isDeletingRoom}>{isDeletingRoom ? <Loader2 className="animate-spin" /> : 'Deletar canal'}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      <Dialog open={openSettingsDialog} onOpenChange={setOpenSettingsDialog}>
-        <DialogContent className="max-w-s">
-          <DialogHeader>
-            <DialogTitle>Configurações</DialogTitle>
-            <DialogDescription>Configurações do workspace</DialogDescription>
-          </DialogHeader>
-        </DialogContent>
-      </Dialog>
+      <MyWorkspace openSettingsDialog={openSettingsDialog} setOpenSettingsDialog={setOpenSettingsDialog} />
     </div >
   );
 }

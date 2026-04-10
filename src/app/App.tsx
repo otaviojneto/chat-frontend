@@ -34,7 +34,7 @@ export default function App() {
   };
 
   return (
-    <ThemeProvider>
+    <ThemeProvider defaultTheme="dark" forcedTheme="dark">
       <div className="flex h-screen bg-background">
         <Sidebar
           channels={channels}
