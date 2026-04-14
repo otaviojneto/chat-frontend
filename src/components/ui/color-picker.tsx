@@ -18,6 +18,10 @@ interface ColorPickerProps {
 export function ColorPicker({ value = "#000000", onChange }: ColorPickerProps) {
   const [color, setColor] = React.useState(value);
 
+  React.useEffect(() => {
+    setColor(value);
+  }, [value]);
+
   const handleChange = (newColor: string) => {
     setColor(newColor);
     onChange?.(newColor);

@@ -26,6 +26,7 @@ interface SidebarProps {
   onAddChannel: UseMutateAsyncFunction<Room, Error, string, unknown>;
   onDeleteChannel: (channelId: string) => void | Promise<void>;
   isDeletingRoom: boolean;
+  currentUserId: string | null;
 }
 
 export function Sidebar({
@@ -35,12 +36,14 @@ export function Sidebar({
   onAddChannel,
   onDeleteChannel,
   isDeletingRoom,
+  currentUserId,
 }: SidebarProps) {
   const [isAddChannelDialogOpen, setIsAddChannelDialogOpen] = useState(false);
   const [newChannelName, setNewChannelName] = useState('');
   const [selectedChannelId, setSelectedChannelId] = useState<string | null>(null);
   const [openDeleteChannelDialog, setOpenDeleteChannelDialog] = useState(false);
   const [openSettingsDialog, setOpenSettingsDialog] = useState(false);
+
 
   const handleCreateRoom = async (name: string) => {
     const normalizedName = name.trim();
@@ -153,7 +156,7 @@ export function Sidebar({
         </DialogContent>
       </Dialog>
 
-      <MyWorkspace openSettingsDialog={openSettingsDialog} setOpenSettingsDialog={setOpenSettingsDialog} />
+      <MyWorkspace userId={currentUserId ?? ''} openSettingsDialog={openSettingsDialog} setOpenSettingsDialog={setOpenSettingsDialog} />
     </div >
   );
 }

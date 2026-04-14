@@ -33,6 +33,10 @@ export type ImageUploaderProps = Omit<
     className?: string
     /** Classes na área tracejada. */
     dropzoneClassName?: string
+    /** URL de imagem já salva (ex.: API); usada quando não há `File` novo. */
+    remotePreviewUrl?: string | null
+    /** Chamado ao clicar em "Remover imagem" (após limpar o arquivo). */
+    onClear?: () => void
 }
 
 const ImageUploader = React.forwardRef<HTMLInputElement, ImageUploaderProps>(
@@ -48,6 +52,8 @@ const ImageUploader = React.forwardRef<HTMLInputElement, ImageUploaderProps>(
             error,
             className,
             dropzoneClassName,
+            remotePreviewUrl,
+            onClear,
             accept = "image/png,image/jpeg,image/webp",
             ...inputProps
         },
@@ -119,9 +125,11 @@ const ImageUploader = React.forwardRef<HTMLInputElement, ImageUploaderProps>(
         const clear = () => {
             if (inputInnerRef.current) inputInnerRef.current.value = ""
             setFile(null)
+            onClear?.()
         }
 
-        const hasImage = Boolean(value && previewUrl)
+        const displaySrc = previewUrl ?? remotePreviewUrl ?? null
+        const hasImage = Boolean(displaySrc)
 
         return (
             <div
@@ -156,7 +164,7 @@ const ImageUploader = React.forwardRef<HTMLInputElement, ImageUploaderProps>(
                         {hasImage ? (
                             <>
                                 <img
-                                    src={previewUrl!}
+                                    src={displaySrc!}
                                     alt=""
                                     className="max-h-24 w-full max-w-[200px] rounded-md object-contain"
                                 />

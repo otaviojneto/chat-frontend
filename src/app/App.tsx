@@ -20,7 +20,6 @@ export default function App() {
 
   const channels: Channel[] = initializeChat?.channels ?? [];
   const currentUserId = initializeChat?.currentUserId ?? null;
-
   const activeChannel =
     channels.find((c) => c.name === activeChannelName) ?? channels[0];
 
@@ -43,6 +42,7 @@ export default function App() {
           onAddChannel={createRoom}
           onDeleteChannel={handleDeleteChannel}
           isDeletingRoom={isDeletingRoom}
+          currentUserId={currentUserId}
         />
         {activeChannel && (
           <ChatArea
