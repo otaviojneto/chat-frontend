@@ -7,10 +7,52 @@ import { useCreateRooms } from '@/application/queries/rooms/use-rooms/use-create
 import { useDeleteRoom } from '@/application/queries/rooms/use-rooms/use-delete-room';
 import { ThemeProvider } from 'next-themes';
 import { useConfigUser } from '@/application/queries/config-user/use-config-user';
+import Login from './login';
+import { Navigate, Route, Routes } from 'react-router-dom';
 
 export type { Channel, Message } from './types';
 
 export default function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(
+    () => localStorage.getItem('isAuthenticated') === 'true'
+  );
+
+  const handleLoginSuccess = () => {
+    localStorage.setItem('isAuthenticated', 'true');
+    setIsAuthenticated(true);
+  };
+
+  return (
+    <Routes>
+      <Route
+        path="/login"
+        element={
+          isAuthenticated ? (
+            <Navigate to="/chat" replace />
+          ) : (
+            <Login onLoginSuccess={handleLoginSuccess} />
+          )
+        }
+      />
+      <Route
+        path="/chat"
+        element={
+          isAuthenticated ? (
+            <ProtectedApp />
+          ) : (
+            <Navigate to="/login" replace />
+          )
+        }
+      />
+      <Route
+        path="*"
+        element={<Navigate to={isAuthenticated ? '/chat' : '/login'} replace />}
+      />
+    </Routes>
+  );
+}
+
+function ProtectedApp() {
   const [activeChannelName, setActiveChannelName] = useState('');
   const { data: initializeChat } = useInitializeChat();
   const { mutateAsync: createRoom } = useCreateRooms();
