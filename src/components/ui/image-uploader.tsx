@@ -155,7 +155,7 @@ const ImageUploader = React.forwardRef<HTMLInputElement, ImageUploaderProps>(
                     <label
                         htmlFor={id}
                         className={cn(
-                            "flex min-h-32 w-full cursor-pointer flex-col items-center justify-center hover:bg-gray-700 hover:border-gray-400 gap-2 rounded-lg border-2 border-dashed border-gray-500  bg-gray-800 px-4 py-6 text-center transition-colors",
+                            "flex min-h-32 w-full cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-border bg-muted/30 px-4 py-6 text-center text-foreground transition-colors hover:border-muted-foreground/50 hover:bg-muted/50",
                             isDragging && "border-primary bg-primary/5",
                             error && "border-destructive",
                             disabled && "cursor-not-allowed"
@@ -168,25 +168,25 @@ const ImageUploader = React.forwardRef<HTMLInputElement, ImageUploaderProps>(
                                     alt=""
                                     className="max-h-24 w-full max-w-[200px] rounded-md object-contain"
                                 />
-                                <p className="text-sm font-medium text-gray-200">
+                                <p className="text-sm font-medium text-foreground">
                                     Imagem selecionada
                                 </p>
-                                <p className="text-xs text-gray-200">
+                                <p className="text-xs text-muted-foreground">
                                     Clique para escolher outra imagem
                                 </p>
                             </>
                         ) : (
                             <>
                                 <span className="flex size-10 items-center justify-center">
-                                    <Upload className="size-8 text-gray-200" aria-hidden />
+                                    <Upload className="size-8 text-muted-foreground" aria-hidden />
                                 </span>
-                                <p className="text-sm text-gray-200">
-                                    <span className="font-medium ">
+                                <p className="text-sm text-foreground">
+                                    <span className="font-medium">
                                         Arraste uma imagem
                                     </span>{" "}
                                     ou clique para selecionar
                                 </p>
-                                <p className="text-xs text-gray-200">
+                                <p className="text-xs text-muted-foreground">
                                     PNG, JPEG ou WebP
                                 </p>
                             </>

@@ -30,50 +30,47 @@ const MyWorkspace: React.FC<MyWorkspaceProps> = ({ openSettingsDialog, setOpenSe
     const { mutateAsync: upsertUserConfig } = useUpsertUserConfig();
     const [avatarRemoteCleared, setAvatarRemoteCleared] = React.useState(false);
 
-    const { control, handleSubmit, reset } = useForm<WorkspaceSettingsForm>({
-        defaultValues: {
+    const formValues = React.useMemo(
+        (): WorkspaceSettingsForm => ({
             avatar: null,
-            name: '',
-            email: '',
-            colorTheme: '#000000',
-            themeDarkMode: false,
-        },
+            name: configUser?.name ?? '',
+            email: configUser?.email ?? '',
+            colorTheme: configUser?.colorTheme ?? '#000000',
+            themeDarkMode: configUser?.themeDarkMode ?? false,
+        }),
+        [configUser],
+    );
+
+    const { control, handleSubmit } = useForm<WorkspaceSettingsForm>({
+        values: formValues,
     });
 
     React.useEffect(() => {
-        if (!configUser) return;
         setAvatarRemoteCleared(false);
-        reset({
-            avatar: null,
-            name: configUser.name ?? '',
-            email: configUser.email ?? '',
-            colorTheme: configUser.colorTheme ?? '#000000',
-            themeDarkMode: configUser.themeDarkMode ?? false,
-        });
-    }, [configUser, reset]);
+    }, [configUser, openSettingsDialog]);
 
     const remoteAvatarUrl =
         avatarRemoteCleared ? undefined : configUser?.avatarUrl;
 
     const onSubmit = async (data: WorkspaceSettingsForm) => {
-        console.log(data);
         await upsertUserConfig({
             userId,
             ...data,
         });
+        setOpenSettingsDialog(false);
     };
 
     return <Dialog open={openSettingsDialog} onOpenChange={setOpenSettingsDialog}>
         <DialogContent className="min-w-2xl max-w-2xl">
             <DialogHeader>
                 <DialogTitle className='text-xl font-semibold'>Configurações</DialogTitle>
-                <DialogDescription className='text-gray-400 m-0 font-medium'>
+                <DialogDescription className="m-0 font-medium">
                     Configurações do meu workspace
                 </DialogDescription>
             </DialogHeader>
             <form id="workspace-settings" onSubmit={handleSubmit(onSubmit)} >
-                <div className='flex flex-col gap-4 border mt-4 border-gray-700 rounded-lg p-6'>
-                    <h1 className='text-lg font-semibold text-white'>Seus dados</h1>
+                <div className="mt-4 flex flex-col gap-4 rounded-lg border border-border p-6">
+                    <h1 className="text-lg font-semibold text-foreground">Seus dados</h1>
                     <Controller
                         name="name"
                         control={control}
@@ -138,8 +135,8 @@ const MyWorkspace: React.FC<MyWorkspaceProps> = ({ openSettingsDialog, setOpenSe
                     />
                 </div>
 
-                <div className='flex flex-col gap-4 border mt-4 border-gray-700 rounded-lg p-6'>
-                    <h1 className='text-lg font-semibold text-white'>Temas</h1>
+                <div className="mt-4 flex flex-col gap-4 rounded-lg border border-border p-6">
+                    <h1 className="text-lg font-semibold text-foreground">Temas</h1>
                     <Controller
                         name="colorTheme"
                         control={control}
@@ -161,12 +158,12 @@ const MyWorkspace: React.FC<MyWorkspaceProps> = ({ openSettingsDialog, setOpenSe
                             <div>
                                 <Label>Modo claro/escuro</Label>
                                 <div className='flex items-center gap-2 pt-1'>
-                                    <Moon className='size-5 text-gray-200' />
+                                    <Sun className="size-5 text-muted-foreground" />
                                     <Switch
                                         checked={field.value}
                                         onCheckedChange={field.onChange}
                                     />
-                                    <Sun className='size-5 text-gray-200' />
+                                    <Moon className="size-5 text-muted-foreground" />
                                 </div>
                             </div>
                         )}
@@ -174,8 +171,8 @@ const MyWorkspace: React.FC<MyWorkspaceProps> = ({ openSettingsDialog, setOpenSe
                 </div>
             </form>
             <DialogFooter className="flex justify-end gap-2 bg-transparent border-t-0">
-                <Button onClick={() => setOpenSettingsDialog(false)} className="text-gray-400 bg-transparent border-gray-400 cursor-pointer" variant="outline">Cancelar</Button>
-                <Button type="submit" form="workspace-settings" className=" border-gray-400 cursor-pointer" variant="outline">Salvar</Button>
+                <Button type="button" variant="outline" onClick={() => setOpenSettingsDialog(false)}>Cancelar</Button>
+                <Button type="submit" form="workspace-settings" variant="default">Salvar</Button>
             </DialogFooter>
         </DialogContent>
     </Dialog>

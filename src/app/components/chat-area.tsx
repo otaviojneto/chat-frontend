@@ -9,6 +9,7 @@ import { queryKeys, useGetMessages, useSendMessage } from '@/application/queries
 import type { BackendMessage } from '~/application/services/messages/type';
 import { socket } from '@/application/socket';
 import type { Channel } from '../types';
+import { SendIcon } from 'lucide-react';
 
 type Message = {
   id: string;
@@ -76,12 +77,12 @@ export const ChatArea = ({ channel, currentUserId }: ChatAreaProps) => {
   };
 
   return (
-    <main className="flex bg-gray-950 min-w-0 flex-1 flex-col">
-      <header className="shrink-0 border-b border-gray-800 p-4">
-        <h1 className="text-lg font-semibold text-white">#{channel.name}</h1>
+    <main className="flex min-w-0 flex-1 flex-col bg-background">
+      <header className="shrink-0 border-b border-border p-4.5">
+        <h1 className="text-lg font-semibold text-foreground">#{channel.name}</h1>
       </header>
 
-      <ScrollArea className="min-h-0 flex-1 bg-gray-950">
+      <ScrollArea className="min-h-0 flex-1 bg-background">
         <ul className="flex flex-col gap-4 p-4">
           {messages.map((m) => (
             <li key={m.id} className="flex gap-3">
@@ -93,28 +94,28 @@ export const ChatArea = ({ channel, currentUserId }: ChatAreaProps) => {
 
               <div className="min-w-0">
                 <div className="flex flex-wrap items-baseline gap-2">
-                  <span className="font-medium text-white">{m.user}</span>
-                  <span className="text-xs text-gray-400">
+                  <span className="font-medium text-foreground">{m.user}</span>
+                  <span className="text-xs text-muted-foreground">
                     {m.timestamp.toLocaleTimeString()}
                   </span>
                 </div>
-                <p className="text-sm wrap-break-word text-white">{m.text}</p>
+                <p className="text-sm wrap-break-word text-foreground">{m.text}</p>
               </div>
             </li>
           ))}
         </ul>
       </ScrollArea>
 
-      <Separator className="bg-gray-800" />
+      <Separator />
 
-      <form onSubmit={handleSubmit} className="flex shrink-0 gap-2 p-4">
+      <form onSubmit={handleSubmit} className="flex items-center gap-2 p-4">
         <Input
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
           placeholder="Mensagem..."
-          className="flex-1 bg-gray-900 text-white border-gray-700"
+          className="flex-1 border-input h-9"
         />
-        <Button type="submit">Enviar</Button>
+        <Button type="submit" size="lg"><SendIcon className="size-4" /> Enviar</Button>
       </form>
     </main>
   );

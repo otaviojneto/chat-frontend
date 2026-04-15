@@ -31,18 +31,18 @@ export function ColorPicker({ value = "#000000", onChange }: ColorPickerProps) {
     <Popover>
       <PopoverTrigger
         type="button"
-        className="flex h-10 w-full cursor-pointer items-center justify-between rounded-md border border-gray-500 bg-grays-900 px-4 hover:bg-grays-900 hover:dark:bg-transparent"
+        className="flex h-10 w-full cursor-pointer items-center justify-between rounded-md border dark:border-input bg-background px-4 text-sm text-foreground transition-colors hover:bg-accent/50"
       >
         <div className="flex items-center gap-2">
           <div
-            className="h-4 w-4 rounded border"
+            className="h-4 w-4 rounded border border-border"
             style={{ backgroundColor: color }}
           />
           <span>{color}</span>
         </div>
       </PopoverTrigger>
 
-      <PopoverContent className="w-[220px] space-y-3 p-3 bg-gray-900">
+      <PopoverContent className="w-[220px] space-y-3 p-3">
         <HexColorPicker color={color} onChange={handleChange} />
 
         <Input

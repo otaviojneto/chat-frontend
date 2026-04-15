@@ -16,7 +16,7 @@ export function MessageItem({ message }: MessageItemProps) {
     return (
         <div className="flex gap-3 hover:bg-accent -mx-2 px-2 py-1 rounded">
             <Avatar className="w-10 h-10">
-                <AvatarFallback className="bg-gradient-to-br from-purple-400 to-pink-400 text-white text-lg">
+                <AvatarFallback className=" text-white text-lg">
                     {message.avatar}
                 </AvatarFallback>
             </Avatar>

@@ -17,7 +17,11 @@ import type { UseMutateAsyncFunction } from '@tanstack/react-query';
 import { EllipsisVertical, Hash, Loader2, Plus, Settings, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import type { Channel } from '../App';
-import MyWorkspace from './my-workspace';
+import MyWorkspace from './my-workspace-dialog';
+import type { GetUserSettings } from '@/application/services/config-user/type';
+
+/** Tom ~blue-800 quando não há cor salva; usada em `--sidebar-color` + misturas. */
+const SIDEBAR_COLOR_DEFAULT = '#1e40af';
 
 interface SidebarProps {
   channels: Channel[];
@@ -27,6 +31,7 @@ interface SidebarProps {
   onDeleteChannel: (channelId: string) => void | Promise<void>;
   isDeletingRoom: boolean;
   currentUserId: string | null;
+  configUser?: GetUserSettings | null;
 }
 
 export function Sidebar({
@@ -37,6 +42,7 @@ export function Sidebar({
   onDeleteChannel,
   isDeletingRoom,
   currentUserId,
+  configUser,
 }: SidebarProps) {
   const [isAddChannelDialogOpen, setIsAddChannelDialogOpen] = useState(false);
   const [newChannelName, setNewChannelName] = useState('');
@@ -70,30 +76,54 @@ export function Sidebar({
     e.stopPropagation();
   };
 
+  const sidebarAccent =
+    configUser?.colorTheme?.trim() || SIDEBAR_COLOR_DEFAULT;
 
   return (
-    <div className="w-64 bg-blue-800 text-white flex flex-col">
-      <div className="p-4 flex justify-between items-center">
-        <h1 className="font-bold text-lg">Meu Workspace</h1>
+    <div
+      className="flex w-64 flex-col bg-(--sidebar-color) text-white"
+      style={
+        { '--sidebar-color': sidebarAccent } as React.CSSProperties
+      }
+    >
+      <div className="flex items-center justify-between p-4">
+        <h1 className="text-lg font-bold">Meu Workspace</h1>
 
-
-        <Button variant="ghost" size="icon" onClick={() => setOpenSettingsDialog(true)} className='cursor-pointer'><Settings /></Button>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => setOpenSettingsDialog(true)}
+          className="cursor-pointer text-white hover:bg-[color-mix(in_srgb,var(--sidebar-color)_82%,white)]"
+        >
+          <Settings />
+        </Button>
       </div>
 
-      <Separator className="bg-blue-600" />
+      <Separator className="bg-[color-mix(in_srgb,var(--sidebar-color)_58%,white)]" />
 
       <ScrollArea className="flex-1">
         <div className="p-3">
-          <div className="text-sm text-blue-300 mb-2 px-2 py-1 flex justify-between hover:bg-blue-700 rounded-md">Canais  <button onClick={() => setIsAddChannelDialogOpen(true)} className="text-transparent cursor-pointer hover:text-white"><Plus size={18} /></button></div>
+          <div className="mb-2 flex justify-between rounded-md px-2 py-1 text-sm text-white/85 hover:bg-[color-mix(in_srgb,var(--sidebar-color)_78%,black)]">
+            Canais{' '}
+            <button
+              type="button"
+              onClick={() => setIsAddChannelDialogOpen(true)}
+              className="cursor-pointer text-white/0 transition-colors hover:text-white"
+            >
+              <Plus size={18} />
+            </button>
+          </div>
           <div className="space-y-1">
             {channels.map((channel) => (
               <div key={channel.id} className="relative">
                 <Button
                   onClick={() => onSelectChannel(channel.name)}
                   variant="ghost"
-                  className={cn("w-full justify-between gap-2 hover:text-white", activeChannelId === channel.id
-                    ? 'bg-blue-700 text-white hover:bg-blue-700 '
-                    : 'text-blue-200 hover:bg-blue-600'
+                  className={cn(
+                    'w-full justify-between gap-2',
+                    activeChannelId === channel.id
+                      ? 'bg-[color-mix(in_srgb,var(--sidebar-color)_68%,black)] text-white hover:bg-[color-mix(in_srgb,var(--sidebar-color)_68%,black)]! hover:text-white!'
+                      : 'text-white/90 hover:bg-[color-mix(in_srgb,var(--sidebar-color)_88%,white)] hover:text-white',
                   )}
                 >
                   <span className="flex items-center gap-2">
@@ -105,7 +135,7 @@ export function Sidebar({
                 <DropdownMenu>
                   <DropdownMenuTrigger
                     type="button"
-                    className="absolute right-0 top-0 z-10 flex size-8 cursor-pointer items-center justify-center rounded-full hover:text-blue-200/80 outline-none transition-colors text-transparent focus-visible:ring-2 focus-visible:ring-blue-300"
+                    className="absolute top-0 right-0 z-10 flex size-8 cursor-pointer items-center justify-center rounded-full text-transparent outline-none transition-colors hover:text-white/90 focus-visible:ring-2 focus-visible:ring-white/40"
                     onClick={(e) => e.stopPropagation()}
                   >
                     <EllipsisVertical className="size-4" />
@@ -134,10 +164,10 @@ export function Sidebar({
             <DialogDescription >
               Adicione um novo canal para sua equipe.
             </DialogDescription>
-            <Input type="text" className="border-gray-400" placeholder="Nome do canal" value={newChannelName} onChange={(e) => setNewChannelName(e.target.value)} />
+            <Input type="text" placeholder="Nome do canal" value={newChannelName} onChange={(e) => setNewChannelName(e.target.value)} />
           </DialogHeader>
           <DialogFooter className="flex justify-end gap-2 bg-transparent border-t-0">
-            <Button className="text-gray-400 bg-transparent border-gray-400" variant="outline" onClick={() => setIsAddChannelDialogOpen(false)}>Cancelar</Button>
+            <Button variant="outline" onClick={() => setIsAddChannelDialogOpen(false)}>Cancelar</Button>
             <Button onClick={() => handleCreateRoom(newChannelName)} disabled={!newChannelName.trim()}>Criar canal</Button>
           </DialogFooter>
         </DialogContent>
@@ -150,7 +180,7 @@ export function Sidebar({
             <DialogDescription>Tem certeza que deseja deletar este canal?</DialogDescription>
           </DialogHeader>
           <DialogFooter className="flex justify-end gap-2 bg-transparent border-t-0">
-            <Button className="text-gray-400 bg-transparent border-gray-400" variant="outline" onClick={() => setOpenDeleteChannelDialog(false)}>Cancelar</Button>
+            <Button variant="outline" onClick={() => setOpenDeleteChannelDialog(false)}>Cancelar</Button>
             <Button className={cn(isDeletingRoom && 'px-11')} variant="destructive" onClick={() => handleDeleteChannel(selectedChannelId ?? '')} disabled={isDeletingRoom}>{isDeletingRoom ? <Loader2 className="animate-spin" /> : 'Deletar canal'}</Button>
           </DialogFooter>
         </DialogContent>
