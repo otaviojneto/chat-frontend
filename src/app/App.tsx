@@ -9,6 +9,7 @@ import { ThemeProvider } from 'next-themes';
 import { useConfigUser } from '@/application/queries/config-user/use-config-user';
 import Login from './login';
 import { Navigate, Route, Routes } from 'react-router-dom';
+import { useGetUsers } from '@/application/queries/all-users/all-users';
 
 export type { Channel, Message } from './types';
 
@@ -54,12 +55,13 @@ export default function App() {
 
 function ProtectedApp() {
   const [activeChannelName, setActiveChannelName] = useState('');
+  const [activeUserId, setActiveUserId] = useState('');
   const { data: initializeChat } = useInitializeChat();
   const { mutateAsync: createRoom } = useCreateRooms();
   const { mutateAsync: deleteRoom, isPending: isDeletingRoom } = useDeleteRoom();
 
 
-
+  const { data: allUsers } = useGetUsers();
 
   const channels: Channel[] = initializeChat?.channels ?? [];
   const currentUserId = initializeChat?.currentUserId ?? null;
@@ -90,11 +92,14 @@ function ProtectedApp() {
           channels={channels}
           activeChannelId={activeChannel?.id ?? ''}
           onSelectChannel={setActiveChannelName}
+          activeUserId={activeUserId}
+          onSelectUser={setActiveUserId}
           onAddChannel={createRoom}
           onDeleteChannel={handleDeleteChannel}
           isDeletingRoom={isDeletingRoom}
           currentUserId={currentUserId}
           configUser={configUser}
+          onlineUsers={allUsers ?? []}
         />
         {activeChannel && (
           <ChatArea

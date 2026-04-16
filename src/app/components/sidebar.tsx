@@ -19,6 +19,8 @@ import { useState } from 'react';
 import type { Channel } from '../App';
 import MyWorkspace from './my-workspace-dialog';
 import type { GetUserSettings } from '@/application/services/config-user/type';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import type { User } from '@/application/services/users/type';
 
 /** Tom ~blue-800 quando não há cor salva; usada em `--sidebar-color` + misturas. */
 const SIDEBAR_COLOR_DEFAULT = '#1e40af';
@@ -27,29 +29,34 @@ interface SidebarProps {
   channels: Channel[];
   activeChannelId: string;
   onSelectChannel: (channelName: string) => void;
+  activeUserId: string;
+  onSelectUser: (userId: string) => void;
   onAddChannel: UseMutateAsyncFunction<Room, Error, string, unknown>;
   onDeleteChannel: (channelId: string) => void | Promise<void>;
   isDeletingRoom: boolean;
   currentUserId: string | null;
   configUser?: GetUserSettings | null;
+  onlineUsers: User[];
 }
 
 export function Sidebar({
   channels,
   activeChannelId,
   onSelectChannel,
+  activeUserId,
+  onSelectUser,
   onAddChannel,
   onDeleteChannel,
   isDeletingRoom,
   currentUserId,
   configUser,
+  onlineUsers
 }: SidebarProps) {
   const [isAddChannelDialogOpen, setIsAddChannelDialogOpen] = useState(false);
   const [newChannelName, setNewChannelName] = useState('');
   const [selectedChannelId, setSelectedChannelId] = useState<string | null>(null);
   const [openDeleteChannelDialog, setOpenDeleteChannelDialog] = useState(false);
   const [openSettingsDialog, setOpenSettingsDialog] = useState(false);
-
 
   const handleCreateRoom = async (name: string) => {
     const normalizedName = name.trim();
@@ -101,7 +108,7 @@ export function Sidebar({
 
       <Separator className="bg-[color-mix(in_srgb,var(--sidebar-color)_58%,white)]" />
 
-      <ScrollArea className="flex-1">
+      <ScrollArea>
         <div className="p-3">
           <div className="mb-2 flex justify-between rounded-md px-2 py-1 text-sm text-white/85 hover:bg-[color-mix(in_srgb,var(--sidebar-color)_78%,black)]">
             Canais{' '}
@@ -152,6 +159,35 @@ export function Sidebar({
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>
+            ))}
+          </div>
+        </div>
+      </ScrollArea>
+
+      <ScrollArea className="flex-1">
+        <div className="p-3">
+          <div className="mb-2 flex justify-between rounded-md px-2 py-1 text-sm text-white/85">
+            Amigos
+          </div>
+
+          <div className="flex flex-col gap-2">
+            {onlineUsers.map((user) => (
+              <Button
+                key={user.id}
+                onClick={() => onSelectUser(user.id)}
+                variant="ghost"
+                className={cn(
+                  'w-full items-center justify-start gap-2 text-left',
+                  activeUserId === user.id
+                    ? 'bg-[color-mix(in_srgb,var(--sidebar-color)_68%,black)] text-white hover:bg-[color-mix(in_srgb,var(--sidebar-color)_68%,black)]! hover:text-white!'
+                    : 'text-white/90 hover:bg-[color-mix(in_srgb,var(--sidebar-color)_88%,white)] hover:text-white',
+                )}
+              >
+                <Avatar className="rounded-md!" size="sm">
+                  <AvatarFallback className="rounded-md!">{user.name.charAt(0)}</AvatarFallback>
+                </Avatar>
+                <span>{user.name}</span>
+              </Button>
             ))}
           </div>
         </div>
