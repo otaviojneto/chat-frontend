@@ -10,16 +10,15 @@ import {
 } from "@tanstack/react-query";
 import { userConfigService } from "~/application/services/config-user/user-config";
 
-export const configUserQueryKey = (userId: string) =>
-  ["config-user", userId] as const;
+export const configUserQueryKey = ["config-user", "me"] as const;
 
 export const useConfigUser = (
-  id: string,
+  id?: string,
 ): UseQueryResult<GetUserSettings, Error> => {
   return useQuery({
-    queryKey: configUserQueryKey(id),
-    queryFn: () => userConfigService.getConfigUser(id),
-    enabled: Boolean(id),
+    queryKey: configUserQueryKey,
+    queryFn: () => userConfigService.getConfigUser(),
+    enabled: id === undefined || Boolean(id),
   });
 };
 
@@ -32,25 +31,23 @@ export const useUpsertUserConfig = () => {
 
   return useMutation({
     mutationFn: async (body: UpsertUserConfigPayload) => {
-      const { avatar: _avatar, ...payload } = body;
+      const { avatar, ...payload } = body;
+      void avatar;
       return userConfigService.upsertUserConfig(payload);
     },
     onSuccess: (_data, variables) => {
       // Aplica já o que foi salvo no cache para o tema atualizar na hora (o GET pode vir defasado).
-      queryClient.setQueryData<GetUserSettings>(
-        configUserQueryKey(variables.userId),
-        (prev) => ({
-          ...(prev ?? { userId: variables.userId }),
-          userId: variables.userId,
-          name: variables.name ?? prev?.name,
-          email: variables.email ?? prev?.email,
-          colorTheme: variables.colorTheme ?? prev?.colorTheme,
-          themeDarkMode: variables.themeDarkMode ?? prev?.themeDarkMode,
-          avatarUrl: prev?.avatarUrl,
-        }),
-      );
+      queryClient.setQueryData<GetUserSettings>(configUserQueryKey, (prev) => ({
+        ...(prev ?? { userId: variables.userId }),
+        userId: variables.userId,
+        name: variables.name ?? prev?.name,
+        email: variables.email ?? prev?.email,
+        colorTheme: variables.colorTheme ?? prev?.colorTheme,
+        themeDarkMode: variables.themeDarkMode ?? prev?.themeDarkMode,
+        avatarUrl: prev?.avatarUrl,
+      }));
       void queryClient.invalidateQueries({
-        queryKey: configUserQueryKey(variables.userId),
+        queryKey: configUserQueryKey,
       });
     },
   });

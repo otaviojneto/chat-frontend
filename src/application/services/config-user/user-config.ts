@@ -2,8 +2,8 @@ import api from "../../api/api";
 import type { UpsertUserSettings } from "./type";
 
 export const userConfigService = {
-  getConfigUser: async (id: string): Promise<UpsertUserSettings> => {
-    const response = await api.get<UpsertUserSettings>(`/config-user/${id}`);
+  getConfigUser: async (): Promise<UpsertUserSettings> => {
+    const response = await api.get<UpsertUserSettings>("/config-user/me");
     return response.data;
   },
 
