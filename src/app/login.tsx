@@ -1,24 +1,28 @@
+import { useAuthLogin } from "@/application/queries";
+import type { AuthLogin } from "@/application/services/auth/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Controller, useForm } from "react-hook-form";
 
-
 type LoginProps = {
   onLoginSuccess: () => void;
 };
 
-export default function Login(_props: LoginProps) {
+export default function Login({ onLoginSuccess }: LoginProps) {
+  const { mutateAsync, isPending, isError, error } = useAuthLogin();
 
-  const { control, register, handleSubmit } = useForm({
+  const { control, handleSubmit } = useForm<AuthLogin>({
     defaultValues: {
       email: "",
       password: "",
     },
   });
-  const onSubmit = (data: any) => {
-    _props.onLoginSuccess(data.email, data.password);
+
+  const onSubmit = async (data: AuthLogin) => {
+    await mutateAsync(data);
+    onLoginSuccess();
   };
 
 
@@ -40,17 +44,38 @@ export default function Login(_props: LoginProps) {
 
               <div>
                 <Label htmlFor="email">E-mail</Label>
-                <Controller control={control} name="email" render={({ field }) => <Input {...field} />} />
+                <Controller
+                  control={control}
+                  name="email"
+                  rules={{ required: true }}
+                  render={({ field }) => (
+                    <Input id="email" type="email" autoComplete="email" {...field} />
+                  )}
+                />
               </div>
               <div>
                 <Label htmlFor="password">Senha</Label>
-                <Controller control={control} name="password" render={({ field }) => <Input {...field} />} />
+                <Controller
+                  control={control}
+                  name="password"
+                  rules={{ required: true }}
+                  render={({ field }) => (
+                    <Input id="password" type="password" autoComplete="current-password" {...field} />
+                  )}
+                />
               </div>
 
+              {isError && (
+                <p className="text-sm text-destructive" role="alert">
+                  {error instanceof Error ? error.message : "Não foi possível entrar."}
+                </p>
+              )}
 
               <div className="flex justify-between items-center">
                 <a href="/signup" className="text-xs text-muted-foreground transition-all duration-300 hover:text-primary hover:underline">Não tem uma conta? <span className="font-bold">Crie uma agora</span></a>
-                <Button type="submit">Entrar</Button>
+                <Button type="submit" disabled={isPending}>
+                  {isPending ? "Entrando…" : "Entrar"}
+                </Button>
               </div>
             </form>
           </div>

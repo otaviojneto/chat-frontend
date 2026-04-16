@@ -143,7 +143,7 @@ export function Sidebar({
                   <DropdownMenuContent align="end" sideOffset={4} className="min-w-36">
                     <DropdownMenuItem
                       variant="destructive"
-                      className="cursor-pointer"
+                      className="cursor-pointer text-error-200!"
                       onClick={(e) => handleOpenDeleteChannelDialog(channel.id, e)}
                     >
                       <Trash2 />
