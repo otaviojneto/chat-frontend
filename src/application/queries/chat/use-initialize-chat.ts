@@ -2,7 +2,8 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import type { Channel, Message } from "@/app/types";
 import type { Room } from "~/application/services/rooms/type";
 import { roomService } from "~/application/services/rooms/rooms";
-import { userService } from "~/application/services/users/users";
+import { userConfigService } from "~/application/services/config-user/user-config";
+import { configUserQueryKey } from "../config-user/use-config-user";
 import { queryKeys } from "../keys";
 
 type InitializeChatResult = {
@@ -28,15 +29,10 @@ export const useInitializeChat = () => {
   return useQuery({
     queryKey: queryKeys.initializeChat,
     queryFn: async (): Promise<InitializeChatResult> => {
-      const users = await queryClient.fetchQuery({
-        queryKey: queryKeys.users,
-        queryFn: () => userService.getUsers(),
+      const config = await queryClient.fetchQuery({
+        queryKey: configUserQueryKey,
+        queryFn: () => userConfigService.getConfigUser(),
       });
-      const existingUser = users.find((u) => u.name === "Otavio");
-      const user = existingUser ?? (await userService.createUser("Otavio"));
-      if (!existingUser) {
-        await queryClient.invalidateQueries({ queryKey: queryKeys.users });
-      }
 
       const [fromRoom, fromMe] = await Promise.all([
         queryClient.fetchQuery({
@@ -57,7 +53,7 @@ export const useInitializeChat = () => {
         messages: [] as Message[],
       }));
 
-      return { currentUserId: user.id, channels };
+      return { currentUserId: config.userId, channels };
     },
   });
 };
