@@ -110,7 +110,9 @@ function ProtectedApp() {
 
 
   const resolvedTheme = configUser?.themeDarkMode === true ? 'dark' : 'light';
-
+  // ==============================================================================================================================
+  // TODO  =============================================== TODO: Implementar falta implementar a sala de grupo ========================== hoje so tem sala public e privada
+  // ==============================================================================================================================
   return (
     <ThemeProvider
       key={resolvedTheme}
