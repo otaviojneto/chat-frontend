@@ -41,7 +41,7 @@ export const useInitializeChat = () => {
       const [fromRoom, fromMe] = await Promise.all([
         queryClient.fetchQuery({
           queryKey: queryKeys.rooms,
-          queryFn: () => roomService.getRooms(),
+          queryFn: () => roomService.getAllRooms(),
         }),
         queryClient.fetchQuery({
           queryKey: queryKeys.roomsMe,
@@ -67,7 +67,7 @@ export const useRooms = () => {
     queryKey: ["rooms", "merged"] as const,
     queryFn: async () => {
       const [fromRoom, fromMe] = await Promise.all([
-        roomService.getRooms(),
+        roomService.getAllRooms(),
         roomService.getMyRooms(),
       ]);
       return mergeRoomsById(fromRoom, fromMe);

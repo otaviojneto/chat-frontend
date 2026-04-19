@@ -1,17 +1,18 @@
-import { useState } from 'react';
+import { queryKeys, useInitializeChat } from '@/application/queries';
+import { useGetUsers } from '@/application/queries/all-users/all-users';
+import { useConfigUser } from '@/application/queries/config-user/use-config-user';
+import { useAllRooms } from '@/application/queries/rooms/use-rooms/use-all-rooms';
+import { useCreateDirectRoom } from '@/application/queries/rooms/use-rooms/use-create-direct-room';
+import { useCreateRooms } from '@/application/queries/rooms/use-rooms/use-create-rooms';
+import { useDeleteRoom } from '@/application/queries/rooms/use-rooms/use-delete-room';
 import { useQueryClient } from '@tanstack/react-query';
+import { ThemeProvider } from 'next-themes';
+import { useState } from 'react';
+import { Navigate, Route, Routes } from 'react-router-dom';
 import { ChatArea } from './components/chat-area';
 import { Sidebar } from './components/sidebar';
-import type { Channel } from './types';
-import { queryKeys, useInitializeChat } from '@/application/queries';
-import { useCreateRooms } from '@/application/queries/rooms/use-rooms/use-create-rooms';
-import { useCreateDirectRoom } from '@/application/queries/rooms/use-rooms/use-create-direct-room';
-import { useDeleteRoom } from '@/application/queries/rooms/use-rooms/use-delete-room';
-import { ThemeProvider } from 'next-themes';
-import { useConfigUser } from '@/application/queries/config-user/use-config-user';
 import Login from './login';
-import { Navigate, Route, Routes } from 'react-router-dom';
-import { useGetUsers } from '@/application/queries/all-users/all-users';
+import type { Channel } from './types';
 
 export type { Channel, Message } from './types';
 
@@ -63,11 +64,13 @@ function ProtectedApp() {
   >(null);
   const queryClient = useQueryClient();
   const { data: initializeChat } = useInitializeChat();
+  const { data: allRooms } = useAllRooms();
   const { mutateAsync: createRoom } = useCreateRooms();
   const { mutateAsync: createDirectRoom } = useCreateDirectRoom();
   const { mutateAsync: deleteRoom, isPending: isDeletingRoom } = useDeleteRoom();
 
   const { data: allUsers } = useGetUsers();
+  const publicRooms = allRooms?.filter((room) => room.type === 'PUBLIC');
 
   const channels: Channel[] = initializeChat?.channels ?? [];
   const currentUserId = initializeChat?.currentUserId ?? null;
@@ -82,6 +85,7 @@ function ProtectedApp() {
       setActiveChannelName(remaining[0]?.name ?? '');
     }
   };
+
 
   const handleSelectChannel = (channelName: string) => {
     setActiveUserId('');
@@ -104,6 +108,7 @@ function ProtectedApp() {
     }
   };
 
+
   const resolvedTheme = configUser?.themeDarkMode === true ? 'dark' : 'light';
 
   return (
@@ -116,7 +121,7 @@ function ProtectedApp() {
     >
       <div className="flex h-screen bg-background">
         <Sidebar
-          channels={channels}
+          channels={publicRooms ?? []}
           activeChannelId={activeChannel?.id ?? ''}
           onSelectChannel={handleSelectChannel}
           activeUserId={activeUserId}

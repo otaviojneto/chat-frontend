@@ -3,6 +3,12 @@ export type Room = {
   name: string;
 };
 
+export type AllRooms = {
+  id: string;
+  name: string;
+  type: string;
+};
+
 export type CreateDirectRoomBody = {
   targetUserId: string;
 };

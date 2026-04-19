@@ -1,6 +1,5 @@
 'use client';
 
-import type { Room } from '@/application/services/rooms/type';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import {
@@ -16,17 +15,17 @@ import { cn } from '@/lib/utils';
 import type { UseMutateAsyncFunction } from '@tanstack/react-query';
 import { EllipsisVertical, Hash, Loader2, Plus, Settings, Trash2 } from 'lucide-react';
 import { useState } from 'react';
-import type { Channel } from '../App';
 import MyWorkspace from './my-workspace-dialog';
 import type { GetUserSettings } from '@/application/services/config-user/type';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import type { User } from '@/application/services/users/type';
+import type { AllRooms, Room } from '@/application/services/rooms/type';
 
 /** Tom ~blue-800 quando não há cor salva; usada em `--sidebar-color` + misturas. */
 const SIDEBAR_COLOR_DEFAULT = '#1e40af';
 
 interface SidebarProps {
-  channels: Channel[];
+  channels: AllRooms[];
   activeChannelId: string;
   onSelectChannel: (channelName: string) => void;
   activeUserId: string;

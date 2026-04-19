@@ -1,13 +1,14 @@
 import api from "../../api/api";
 import type {
+  AllRooms,
   CreateDirectRoomBody,
   CreateGroupRoomBody,
   Room,
 } from "./type";
 
 export const roomService = {
-  getRooms: async (): Promise<Room[]> => {
-    const response = await api.get<Room[]>("/room");
+  getAllRooms: async (): Promise<AllRooms[]> => {
+    const response = await api.get<AllRooms[]>("/room");
     return response.data;
   },
 
@@ -21,9 +22,7 @@ export const roomService = {
     return response.data;
   },
 
-  createDirectRoom: async (
-    body: CreateDirectRoomBody,
-  ): Promise<Room> => {
+  createDirectRoom: async (body: CreateDirectRoomBody): Promise<Room> => {
     const response = await api.post<Room>("/room/direct", body);
     return response.data;
   },
