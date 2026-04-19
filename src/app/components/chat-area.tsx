@@ -79,7 +79,7 @@ export const ChatArea = ({ channel, currentUserId }: ChatAreaProps) => {
   return (
     <main className="flex min-w-0 flex-1 flex-col bg-background">
       <header className="shrink-0 border-b border-border p-4.5">
-        <h1 className="text-lg font-semibold text-foreground">#{channel.name}</h1>
+        <h1 className="text-lg font-semibold text-foreground">{channel.name}</h1>
       </header>
 
       <ScrollArea className="min-h-0 flex-1 bg-background">

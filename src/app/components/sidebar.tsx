@@ -82,6 +82,7 @@ export function Sidebar({
     setOpenDeleteChannelDialog(true);
     e.stopPropagation();
   };
+  console.log(openingDirectForUserId, 'openingDirectForUserId');
 
   const sidebarAccent =
     configUser?.colorTheme?.trim() || SIDEBAR_COLOR_DEFAULT;

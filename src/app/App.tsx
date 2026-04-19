@@ -93,7 +93,7 @@ function ProtectedApp() {
   };
 
   const handleSelectUser = async (userId: string) => {
-    if (!currentUserId || userId === currentUserId) return;
+    if (!currentUserId) return;
 
     setActiveUserId(userId);
     setOpeningDirectForUserId(userId);
