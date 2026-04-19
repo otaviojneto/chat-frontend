@@ -10,6 +10,18 @@ type InitializeChatResult = {
   channels: Channel[];
 };
 
+/**
+ * Junta duas listas de salas (ex.: `GET /room` e `GET /room/me`) numa só.
+ * Salas com o mesmo `id` aparecem uma vez só — a segunda lista sobrescreve a primeira
+ * para aquele id. O resultado é ordenado alfabeticamente pelo `name`.
+ */
+function mergeRoomsById(a: Room[], b: Room[]): Room[] {
+  const byId = new Map<string, Room>();
+  for (const r of a) byId.set(r.id, r);
+  for (const r of b) byId.set(r.id, r);
+  return [...byId.values()].sort((x, y) => x.name.localeCompare(y.name));
+}
+
 export const useInitializeChat = () => {
   const queryClient = useQueryClient();
 
@@ -26,10 +38,18 @@ export const useInitializeChat = () => {
         await queryClient.invalidateQueries({ queryKey: queryKeys.users });
       }
 
-      const rooms = await queryClient.fetchQuery({
-        queryKey: queryKeys.rooms,
-        queryFn: () => roomService.getRooms(),
-      });
+      const [fromRoom, fromMe] = await Promise.all([
+        queryClient.fetchQuery({
+          queryKey: queryKeys.rooms,
+          queryFn: () => roomService.getRooms(),
+        }),
+        queryClient.fetchQuery({
+          queryKey: queryKeys.roomsMe,
+          queryFn: () => roomService.getMyRooms(),
+        }),
+      ]);
+
+      const rooms = mergeRoomsById(fromRoom, fromMe);
 
       const channels: Channel[] = rooms.map((room) => ({
         id: room.id,
@@ -44,7 +64,13 @@ export const useInitializeChat = () => {
 
 export const useRooms = () => {
   return useQuery<Room[]>({
-    queryKey: queryKeys.rooms,
-    queryFn: () => roomService.getRooms(),
+    queryKey: ["rooms", "merged"] as const,
+    queryFn: async () => {
+      const [fromRoom, fromMe] = await Promise.all([
+        roomService.getRooms(),
+        roomService.getMyRooms(),
+      ]);
+      return mergeRoomsById(fromRoom, fromMe);
+    },
   });
 };

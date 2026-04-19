@@ -7,8 +7,8 @@ export const messageService = {
     return response.data;
   },
 
-  sendMessage: async (payload: SendMessagePayload): Promise<unknown> => {
-    const response = await api.post("/messages", payload);
+  sendMessage: async (payload: SendMessagePayload): Promise<BackendMessage> => {
+    const response = await api.post<BackendMessage>("/messages", payload);
     return response.data;
   },
 };

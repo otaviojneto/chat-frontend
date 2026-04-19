@@ -30,7 +30,8 @@ interface SidebarProps {
   activeChannelId: string;
   onSelectChannel: (channelName: string) => void;
   activeUserId: string;
-  onSelectUser: (userId: string) => void;
+  onSelectUser: (userId: string) => void | Promise<void>;
+  openingDirectForUserId?: string | null;
   onAddChannel: UseMutateAsyncFunction<Room, Error, string, unknown>;
   onDeleteChannel: (channelId: string) => void | Promise<void>;
   isDeletingRoom: boolean;
@@ -45,6 +46,7 @@ export function Sidebar({
   onSelectChannel,
   activeUserId,
   onSelectUser,
+  openingDirectForUserId = null,
   onAddChannel,
   onDeleteChannel,
   isDeletingRoom,
@@ -72,7 +74,6 @@ export function Sidebar({
 
   const handleDeleteChannel = async (channelId: string) => {
     await onDeleteChannel(channelId);
-    onSelectChannel(channelId);
     setOpenDeleteChannelDialog(false);
     setSelectedChannelId(null);
   };
@@ -174,8 +175,9 @@ export function Sidebar({
             {onlineUsers.map((user) => (
               <Button
                 key={user.id}
-                onClick={() => onSelectUser(user.id)}
+                onClick={() => void onSelectUser(user.id)}
                 variant="ghost"
+                disabled={Boolean(openingDirectForUserId)}
                 className={cn(
                   'w-full items-center justify-start gap-2 text-left',
                   activeUserId === user.id
@@ -186,7 +188,10 @@ export function Sidebar({
                 <Avatar className="rounded-md!" size="sm">
                   <AvatarFallback className="rounded-md!">{user.name.charAt(0)}</AvatarFallback>
                 </Avatar>
-                <span>{user.name}</span>
+                <span className="min-w-0 flex-1 truncate">{user.name}</span>
+                {openingDirectForUserId === user.id ? (
+                  <Loader2 className="size-4 shrink-0 animate-spin" aria-hidden />
+                ) : null}
               </Button>
             ))}
           </div>

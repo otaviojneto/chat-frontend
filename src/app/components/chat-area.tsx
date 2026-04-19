@@ -42,24 +42,24 @@ export const ChatArea = ({ channel, currentUserId }: ChatAreaProps) => {
 
   const messages = useMemo(() => mapToUiMessages(rawMessages), [rawMessages]);
 
-  // ⚡ realtime socket
   useEffect(() => {
     socket.emit('joinRoom', channel.id);
 
-    socket.on('message', (msg: BackendMessage) => {
-      if (msg.roomId === channel.id) {
-        queryClient.setQueryData<BackendMessage[]>(
-          queryKeys.messages(channel.id),
-          (prev = []) => {
-            if (prev.some((m) => m.id === msg.id)) return prev;
-            return [...prev, msg];
-          },
-        );
-      }
-    });
+    const onMessage = (msg: BackendMessage) => {
+      if (msg.roomId !== channel.id) return;
+      queryClient.setQueryData<BackendMessage[]>(
+        queryKeys.messages(channel.id),
+        (prev = []) => {
+          if (prev.some((m) => m.id === msg.id)) return prev;
+          return [...prev, msg];
+        },
+      );
+    };
+
+    socket.on('message', onMessage);
 
     return () => {
-      socket.off('message');
+      socket.off('message', onMessage);
     };
   }, [channel.id, queryClient]);
 

@@ -1,9 +1,11 @@
 import { useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { ChatArea } from './components/chat-area';
 import { Sidebar } from './components/sidebar';
 import type { Channel } from './types';
-import { useInitializeChat } from '@/application/queries';
+import { queryKeys, useInitializeChat } from '@/application/queries';
 import { useCreateRooms } from '@/application/queries/rooms/use-rooms/use-create-rooms';
+import { useCreateDirectRoom } from '@/application/queries/rooms/use-rooms/use-create-direct-room';
 import { useDeleteRoom } from '@/application/queries/rooms/use-rooms/use-delete-room';
 import { ThemeProvider } from 'next-themes';
 import { useConfigUser } from '@/application/queries/config-user/use-config-user';
@@ -56,10 +58,14 @@ export default function App() {
 function ProtectedApp() {
   const [activeChannelName, setActiveChannelName] = useState('');
   const [activeUserId, setActiveUserId] = useState('');
+  const [openingDirectForUserId, setOpeningDirectForUserId] = useState<
+    string | null
+  >(null);
+  const queryClient = useQueryClient();
   const { data: initializeChat } = useInitializeChat();
   const { mutateAsync: createRoom } = useCreateRooms();
+  const { mutateAsync: createDirectRoom } = useCreateDirectRoom();
   const { mutateAsync: deleteRoom, isPending: isDeletingRoom } = useDeleteRoom();
-
 
   const { data: allUsers } = useGetUsers();
 
@@ -77,6 +83,27 @@ function ProtectedApp() {
     }
   };
 
+  const handleSelectChannel = (channelName: string) => {
+    setActiveUserId('');
+    setActiveChannelName(channelName);
+  };
+
+  const handleSelectUser = async (userId: string) => {
+    if (!currentUserId || userId === currentUserId) return;
+
+    setActiveUserId(userId);
+    setOpeningDirectForUserId(userId);
+    try {
+      const room = await createDirectRoom({ targetUserId: userId });
+      await queryClient.refetchQueries({ queryKey: queryKeys.initializeChat });
+      setActiveChannelName(room.name);
+    } catch {
+      setActiveUserId('');
+    } finally {
+      setOpeningDirectForUserId(null);
+    }
+  };
+
   const resolvedTheme = configUser?.themeDarkMode === true ? 'dark' : 'light';
 
   return (
@@ -91,9 +118,10 @@ function ProtectedApp() {
         <Sidebar
           channels={channels}
           activeChannelId={activeChannel?.id ?? ''}
-          onSelectChannel={setActiveChannelName}
+          onSelectChannel={handleSelectChannel}
           activeUserId={activeUserId}
-          onSelectUser={setActiveUserId}
+          onSelectUser={handleSelectUser}
+          openingDirectForUserId={openingDirectForUserId}
           onAddChannel={createRoom}
           onDeleteChannel={handleDeleteChannel}
           isDeletingRoom={isDeletingRoom}

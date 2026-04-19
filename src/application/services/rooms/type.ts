@@ -4,7 +4,7 @@ export type Room = {
 };
 
 export type CreateDirectRoomBody = {
-  userId: string;
+  targetUserId: string;
 };
 
 export type CreateGroupRoomBody = {
