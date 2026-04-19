@@ -1,3 +1,4 @@
+import type { QueryClient } from "@tanstack/react-query";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import type { Channel, Message } from "@/app/types";
 import type { Room } from "~/application/services/rooms/type";
@@ -6,10 +7,36 @@ import { userConfigService } from "~/application/services/config-user/user-confi
 import { configUserQueryKey } from "../config-user/use-config-user";
 import { queryKeys } from "../keys";
 
-type InitializeChatResult = {
+export type InitializeChatResult = {
   currentUserId: string;
   channels: Channel[];
 };
+
+/**
+ * Insere ou atualiza uma sala no cache do chat sem refetch completo (ex.: após POST /room/direct).
+ */
+export function upsertRoomInInitializeChat(
+  queryClient: QueryClient,
+  room: Room
+): void {
+  queryClient.setQueryData<InitializeChatResult>(
+    queryKeys.initializeChat,
+    (prev) => {
+      if (!prev) return prev;
+      const byId = new Map(prev.channels.map((c) => [c.id, c]));
+      const existing = byId.get(room.id);
+      byId.set(room.id, {
+        id: room.id,
+        name: room.name,
+        messages: existing?.messages ?? ([] as Message[]),
+      });
+      const channels = [...byId.values()].sort((a, b) =>
+        a.name.localeCompare(b.name)
+      );
+      return { ...prev, channels };
+    }
+  );
+}
 
 /**
  * Junta duas listas de salas (ex.: `GET /room` e `GET /room/me`) numa só.

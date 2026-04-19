@@ -13,7 +13,6 @@ export const useCreateDirectRoom = () => {
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: queryKeys.rooms }),
         queryClient.invalidateQueries({ queryKey: queryKeys.roomsMe }),
-        queryClient.invalidateQueries({ queryKey: queryKeys.initializeChat }),
       ]);
     },
   });

@@ -1,4 +1,8 @@
 import { queryKeys, useInitializeChat } from '@/application/queries';
+import {
+  type InitializeChatResult,
+  upsertRoomInInitializeChat,
+} from '@/application/queries/chat/use-initialize-chat';
 import { useGetUsers } from '@/application/queries/all-users/all-users';
 import { useConfigUser } from '@/application/queries/config-user/use-config-user';
 import { useAllRooms } from '@/application/queries/rooms/use-rooms/use-all-rooms';
@@ -99,7 +103,13 @@ function ProtectedApp() {
     setOpeningDirectForUserId(userId);
     try {
       const room = await createDirectRoom({ targetUserId: userId });
-      await queryClient.refetchQueries({ queryKey: queryKeys.initializeChat });
+      upsertRoomInInitializeChat(queryClient, room);
+      const chat = queryClient.getQueryData<InitializeChatResult>(
+        queryKeys.initializeChat
+      );
+      if (!chat?.channels.some((c) => c.id === room.id)) {
+        await queryClient.refetchQueries({ queryKey: queryKeys.initializeChat });
+      }
       setActiveChannelName(room.name);
     } catch {
       setActiveUserId('');
